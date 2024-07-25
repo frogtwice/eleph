@@ -49,6 +49,7 @@ class Search(TypedDict):
 class Mastodon:
     def __init__(self, uri: str = ""):
         self._uri = uri
+        self._instance = uri.split("/")[2]
 
     def v1_accounts_following(
             self,
@@ -104,8 +105,8 @@ class Mastodon:
             return {
                 "accounts": [{
                     "id": "ID",
-                    "username": q,
-                    "acct": q
+                    "username": "username",
+                    "acct": "username"
                 }],
                 "statuses": [],
                 "hashtags": []

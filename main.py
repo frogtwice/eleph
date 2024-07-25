@@ -5,6 +5,8 @@ import eleph
 
 
 def create_app():
+    logging.basicConfig(level=logging.INFO)
+
     return eleph.create_app(
         uri=os.environ["URI"]
     )
