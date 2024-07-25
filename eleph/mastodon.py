@@ -66,17 +66,18 @@ class Mastodon:
 
     def v1_apps(
             self,
-            client_name: str,
-            redirect_uris: str,
+            client_name: str = None,
+            redirect_uris: str = None,
             scopes: str = "read",
             website: str = None,
             **kwargs
     ) -> Application:
         app: Application = {
-            "name": client_name,
             "client_id": str(uuid.uuid4()),
             "client_secret": str(uuid.uuid4())
         }
+        if client_name is not None:
+            app["name"] = client_name
         if website is not None:
             app["website"] = website
         return app

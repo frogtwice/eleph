@@ -6,9 +6,7 @@ from .mastodon import Mastodon
 from .oauth import OAuth
 
 
-def create_app(
-        uri: str
-):
+def create_app(uri: str):
     app = Flask("eleph")
     mastodon = Mastodon(uri)
     oauth = OAuth()
@@ -32,8 +30,6 @@ def create_app(
 
     @app.route("/api/v1/apps", methods=["POST"])
     def mastodon_v1_apps():
-        logger.info(dict(request.args))
-        logger.info(dict(request.form))
         return mastodon.v1_apps(**request.form)
 
     @app.route("/api/v1/accounts/verify_credentials")
