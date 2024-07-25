@@ -1,3 +1,4 @@
+import json
 import logging
 
 from flask import Flask, request, redirect
@@ -17,12 +18,12 @@ def create_app(uri: str):
 
     @app.route("/oauth/token", methods=["POST"])
     def mastodon_oauth_token():
-        app.logger.info(dict(request.values))
+        app.logger.info(json.dumps(dict(request.values)))
         return oauth.token(**request.args)
 
     @app.route("/oauth/authorize/")
     def mastodon_oauth_authorize():
-        app.logger.info(dict(request.values))
+        app.logger.info(json.dumps(dict(request.values)))
         try:
             return oauth.authorize(**request.args)
         except HTTPRedirect as exc:

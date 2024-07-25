@@ -49,7 +49,8 @@ class Search(TypedDict):
 class Mastodon:
     def __init__(self, uri: str = ""):
         self._uri = uri
-        self._instance = uri.split("/")[2]
+        parts = uri.split("/")
+        self._instance = parts[2] if len(parts) >= 2 else ""
 
     def v1_accounts_following(
             self,
