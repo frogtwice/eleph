@@ -26,6 +26,8 @@ class CredentialAccount(TypedDict):
     acct: str
     display_name: str
     note: str
+    avatar: str
+    avatar_static: str
 
 
 class Instance(TypedDict):
@@ -71,7 +73,9 @@ class Mastodon:
             "username": "username",
             "acct": "username",
             "display_name": "username",
-            "note": "test"
+            "note": "test",
+            "avatar": "https://files.mastodon.social/accounts/avatars/000/023/634/original/6ca8804dc46800ad.png",
+            "avatar_static": "https://files.mastodon.social/accounts/avatars/000/023/634/original/6ca8804dc46800ad.png",
         }
 
     def v1_apps(
