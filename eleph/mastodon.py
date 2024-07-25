@@ -24,6 +24,10 @@ class Announcement(TypedDict):
     pass
 
 
+class Conversation(TypedDict):
+    pass
+
+
 class CredentialAccount(TypedDict):
     id: str
     username: str
@@ -115,6 +119,9 @@ class Mastodon:
             app["website"] = website
         return app
 
+    def v1_conversations(self) -> list[Conversation]:
+        return []
+
     def v1_instance(self, **kwargs) -> Instance:
         return {
             "uri": self._uri
@@ -130,6 +137,9 @@ class Mastodon:
         return {}
 
     def v1_timelines_home(self, **kwargs) -> list[Status]:
+        return []
+
+    def v1_timelines_public(self, **kwargs) -> list[Status]:
         return []
 
     def v2_filters(self) -> list[Filter]:

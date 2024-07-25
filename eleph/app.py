@@ -52,6 +52,11 @@ def create_app(uri: str):
     def mastodon_v1_announcements():
         return mastodon.v1_announcements()
 
+    @app.route("/api/v1/conversations")
+    @log_all
+    def mastodon_v1_conversations():
+        return mastodon.v1_conversations()
+
     @app.route("/api/v1/markers")
     @log_all
     def mastodon_v1_markers():
@@ -72,6 +77,11 @@ def create_app(uri: str):
     def mastodon_v1_timelines_home():
         return mastodon.v1_timelines_home()
 
+    @app.route("/api/v1/timelines/public")
+    @log_all
+    def mastodon_v1_timelines_public():
+        return mastodon.v1_timelines_public()
+
     @app.route("/api/v2/search")
     @log_all
     def mastodon_v2_search():
@@ -82,7 +92,7 @@ def create_app(uri: str):
     @log_all
     def default(path):
         logger.info("NOT FOUND")
-        return ""
+        return "Not Found.", 404
 
     ###
 
