@@ -21,7 +21,11 @@ class Application(TypedDict):
 
 
 class CredentialAccount(TypedDict):
+    id: str
     username: str
+    acct: str
+    display_name: str
+    note: str
 
 
 class Instance(TypedDict):
@@ -63,7 +67,11 @@ class Mastodon:
             self
     ) -> CredentialAccount:
         return {
-            "username": "username"
+            "id": "0",
+            "username": "username",
+            "acct": "username",
+            "display_name": "username",
+            "note": "test"
         }
 
     def v1_apps(

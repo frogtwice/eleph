@@ -19,13 +19,11 @@ def create_app(uri: str):
     @app.route("/oauth/token", methods=["POST"])
     @log_request
     def mastodon_oauth_token():
-        app.logger.info(json.dumps(dict(request.values)))
         return oauth.token(**request.args)
 
     @app.route("/oauth/authorize/")
     @log_request
     def mastodon_oauth_authorize():
-        app.logger.info(json.dumps(dict(request.values)))
         try:
             return oauth.authorize(**request.args)
         except HTTPRedirect as exc:
