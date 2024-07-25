@@ -5,6 +5,11 @@ class Token(TypedDict):
     access_token: str
 
 
+class HTTPRedirect(Exception):
+    def __init__(self, url: str):
+        self.url = url
+
+
 class OAuth:
     def authorize(
             self,
@@ -15,7 +20,10 @@ class OAuth:
             force_login: bool = False,
             lang: str = "",
     ) -> str:
-        return "AUTH_CODE"
+        if redirect_uri == "urn:ietf:wg:oauth:2.0:oob":
+            return "AUTH_CODE"
+        else:
+            raise HTTPRedirect(f"{redirect_uri}?code=AUTH_CODE")
 
     def token(
             self,

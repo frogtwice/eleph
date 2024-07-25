@@ -1,9 +1,9 @@
 import logging
 
-from flask import Flask, request
+from flask import Flask, request, redirect
 
 from .mastodon import Mastodon
-from .oauth import OAuth
+from .oauth import OAuth, HTTPRedirect
 
 
 def create_app(uri: str):
@@ -23,7 +23,10 @@ def create_app(uri: str):
     @app.route("/oauth/authorize/")
     def mastodon_oauth_authorize():
         app.logger.info(dict(request.values))
-        return oauth.authorize(**request.args)
+        try:
+            return oauth.authorize(**request.args)
+        except HTTPRedirect as exc:
+            return redirect(exc.url)
 
     @app.route("/api/v1/instance")
     def mastodon_v1_instance():
