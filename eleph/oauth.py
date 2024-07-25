@@ -8,9 +8,9 @@ class Token(TypedDict):
 class OAuth:
     def authorize(
             self,
-            response_type: Literal["code"],
-            client_id: str,
-            redirect_uri: str,
+            response_type: Literal["code"] = None,
+            client_id: str = None,
+            redirect_uri: str = None,
             scope: str = "read",
             force_login: bool = False,
             lang: str = "",
@@ -19,10 +19,10 @@ class OAuth:
 
     def token(
             self,
-            grant_type: Literal["authorization_code", "client_credentials"],
-            client_id: str,
-            client_secret: str,
-            redirect_uri: str,
+            grant_type: Literal["authorization_code", "client_credentials"] = None,
+            client_id: str = None,
+            client_secret: str = None,
+            redirect_uri: str = None,
             code: str = None,
             scope: str = "read",
     ) -> Token:

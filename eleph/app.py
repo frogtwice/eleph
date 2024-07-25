@@ -10,7 +10,6 @@ def create_app(uri: str):
     app = Flask("eleph")
     mastodon = Mastodon(uri)
     oauth = OAuth()
-    logger = logging.getLogger("eleph")
 
     ############
     # MASTODON #
@@ -18,10 +17,12 @@ def create_app(uri: str):
 
     @app.route("/oauth/token", methods=["POST"])
     def mastodon_oauth_token():
+        app.logger.info(dict(request.values))
         return oauth.token(**request.args)
 
     @app.route("/oauth/authorize/")
     def mastodon_oauth_authorize():
+        app.logger.info(dict(request.values))
         return oauth.authorize(**request.args)
 
     @app.route("/api/v1/instance")
