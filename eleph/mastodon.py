@@ -20,6 +20,10 @@ class Application(TypedDict):
     client_secret: NotRequired[str]
 
 
+class Announcement(TypedDict):
+    pass
+
+
 class CredentialAccount(TypedDict):
     id: str
     username: str
@@ -30,8 +34,20 @@ class CredentialAccount(TypedDict):
     avatar_static: str
 
 
+class Filter(TypedDict):
+    pass
+
+
 class Instance(TypedDict):
     uri: str
+
+
+class Marker(TypedDict):
+    pass
+
+
+class Notification(TypedDict):
+    pass
 
 
 class Status(TypedDict):
@@ -78,6 +94,9 @@ class Mastodon:
             "avatar_static": "https://files.mastodon.social/accounts/avatars/000/023/634/original/6ca8804dc46800ad.png",
         }
 
+    def v1_announcements(self) -> list[Announcement]:
+        return []
+
     def v1_apps(
             self,
             client_name: str = None,
@@ -101,10 +120,19 @@ class Mastodon:
             "uri": self._uri
         }
 
+    def v1_markers(self) -> dict[str, Marker]:
+        return {}
+
+    def v1_notifications(self) -> list[Notification]:
+        return []
+
     def v1_preferences(self, **kwargs) -> dict[str, str]:
         return {}
 
     def v1_timelines_home(self, **kwargs) -> list[Status]:
+        return []
+
+    def v2_filters(self) -> list[Filter]:
         return []
 
     def v2_search(
