@@ -1,3 +1,5 @@
+import logging
+
 from flask import Flask, request
 
 from .mastodon import Mastodon
@@ -10,6 +12,7 @@ def create_app(
     app = Flask("eleph")
     mastodon = Mastodon(uri)
     oauth = OAuth()
+    logger = logging.getLogger("eleph")
 
     ############
     # MASTODON #
@@ -29,6 +32,8 @@ def create_app(
 
     @app.route("/api/v1/apps", methods=["POST"])
     def mastodon_v1_apps():
+        logger.info(dict(request.args))
+        logger.info(dict(request.form))
         return mastodon.v1_apps(**request.form)
 
     @app.route("/api/v1/accounts/verify_credentials")
