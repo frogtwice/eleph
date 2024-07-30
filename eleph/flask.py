@@ -12,8 +12,8 @@ from .mastodon import Mastodon
 class FlaskApp(Mastodon):
     def __init__(self, uri: str):
         Mastodon.__init__(self, uri)
-        self._app = Flask("eleph")
         self._logger = logging.getLogger("eleph")
+        self._app = Flask("eleph")
         for endpoint, path, method in self.get_endpoints():
             self._app.route(path, methods=[method])(
                 wraps(endpoint)(partial(self.request_wrapper, endpoint)))
