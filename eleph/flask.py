@@ -40,14 +40,13 @@ class FlaskApp(Mastodon):
     def request_wrapper(self, endpoint, *args, **kwargs):
         message = [f"PATH: {request.path}, METHOD: {request.method}"]
         if len(request.args) > 0:
-            message.append(f"ARGS: {request.args}")
+            message.append(f"ARGS: {dict(request.args)}")
         if len(request.form) > 0:
-            message.append(f"FORM: {request.form}")
+            message.append(f"FORM: {dict(request.form)}")
         try:
+            self._logger.info("\n".join(message))
             result = endpoint(*args, **kwargs)
-            message.append(f"RESULT: {result}")
+            self._logger.info(f"RESULT: {result}")
             return result
         except Redirect as exc:
             return redirect(exc.value)
-        finally:
-            self._logger.info("\n".join(message))
