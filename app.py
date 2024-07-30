@@ -5,4 +5,4 @@ import eleph
 
 logging.basicConfig(level=logging.INFO)
 
-app = eleph.create_app(uri=os.environ.get("URI", ""))
+app = eleph.FlaskApp(uri=os.environ.get("URI", "")).get_app()
