@@ -1,3 +1,3 @@
-from .base import ParameterType, request_kwargs
+from .api import request_kwargs, PathParam, ValueParam, FormParam, QueryParam, HeaderParam
 from .exceptions import Redirect
-from .main import get_endpoints
+from .services import get_endpoints

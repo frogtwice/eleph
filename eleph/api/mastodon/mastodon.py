@@ -1,89 +1,19 @@
-from typing import Literal, TypedDict, NotRequired
+from typing import Literal
 from urllib.parse import urlencode
 
-from .base import API, endpoint, PathParam
-from .exceptions import MissingParameter, Redirect
-
-############
-# ENTITIES #
-############
-
-
-class Account(TypedDict):
-    id: str
-    username: str
-    acct: str
-
-
-class Application(TypedDict):
-    name: str
-    website: NotRequired[str | None]
-    client_id: NotRequired[str]
-    client_secret: NotRequired[str]
-
-
-class Announcement(TypedDict):
-    pass
-
-
-class Conversation(TypedDict):
-    pass
-
-
-class CredentialAccount(TypedDict):
-    id: str
-    username: str
-    acct: str
-    display_name: str
-    note: str
-    avatar: str
-    avatar_static: str
-
-
-class Filter(TypedDict):
-    pass
-
-
-class Marker(TypedDict):
-    pass
-
-
-class Notification(TypedDict):
-    pass
-
-
-class Status(TypedDict):
-    pass
-
-
-class Tag(TypedDict):
-    pass
-
-
-class Token(TypedDict):
-    access_token: str
-
-
-class Search(TypedDict):
-    accounts: list[Account]
-    statuses: list[Status]
-    hashtags: list[Tag]
-
-
-class V1Instance(TypedDict):
-    uri: str
-
-
-##################
-# MASTODON CLASS #
-##################
+from ..api import API, endpoint, PathParam
+from ..exceptions import MissingParameter, Redirect
+from .entities import Token, Account, CredentialAccount, Announcement, Application, Conversation, V1Instance, \
+    Marker, Notification, Status, Filter, Search
+from ...database import Database
 
 
 class Mastodon(API):
-    def __init__(self, uri: str = ""):
-        self._uri = uri
+    def __init__(self, uri: str, database: Database):
+        self._uri = uri or ""
         parts = uri.split("/")
         self._instance = parts[2] if len(parts) >= 2 else ""
+        self._database = database
 
     @endpoint(
         path="/oauth/authorize",

@@ -1,13 +1,12 @@
 import inspect
 from contextvars import ContextVar
 from dataclasses import dataclass
-from enum import Enum
 from functools import wraps
 from inspect import Parameter
 from typing import Callable, Optional, Any, Iterator, Literal, Sequence, Mapping, Type, get_origin, \
-    get_args
+    get_args, TypeAliasType
 
-from eleph.api.exceptions import MissingParameter
+from .exceptions import MissingParameter
 
 request_kwargs: ContextVar[dict[str, Any]] = ContextVar("request_kwargs")
 
@@ -18,22 +17,14 @@ type HeaderParam = str
 type ValueParam[T] = T
 type QueryParam[T] = T
 type FormParam[T] = T
-
-
-class ParameterType(Enum):
-    VALUE = ValueParam
-    QUERY = QueryParam
-    FORM = FormParam
-    PATH = PathParam
-    HEADER = HeaderParam
+type AuthParam[T] = T
 
 
 class API:
     def get_endpoints(
             self,
             get_oauth_token: Callable[[], Optional[tuple[str, str]]],
-            get_request_parameter: Callable[[ParameterType, str], Any],
-
+            get_request_parameter: Callable[[TypeAliasType, str], Any],
     ) -> Iterator[tuple[str, str, Callable]]:
         for _, member in inspect.getmembers(self):
             if isinstance(member, Endpoint):
@@ -44,8 +35,8 @@ class API:
             oauth_level: str,
             oauth_scopes: Sequence[str],
             token: tuple[str | None, str | None],
-    ):
-        return True
+    ) -> Any:
+        ...
 
 
 @dataclass
@@ -67,7 +58,7 @@ class Endpoint:
             self,
             api: API,
             get_oauth_token: Callable[[], Optional[tuple[str, str]]],
-            get_request_parameter: Callable[[ParameterType, str], Any],
+            get_request_parameter: Callable[[TypeAliasType, str], Any],
     ) -> tuple[str, str, Callable]:
         @wraps(self.function)
         def wrapper(**kwargs):
@@ -75,18 +66,21 @@ class Endpoint:
 
             try:
                 token = get_oauth_token()
-                api.oauth_validate_token(self.oauth_level, self.oauth_scopes, token or (None, None))
+                authorization = api.oauth_validate_token(self.oauth_level, self.oauth_scopes, token or (None, None))
                 received_kwargs = {}
-                for name, (origin, arg, default) in self.endpoint_parameters.items():
-                    try:
-                        value = get_request_parameter(origin, name)
-                    except KeyError:
-                        if default != Parameter.empty:
-                            received_kwargs[name] = default
-                        else:
-                            raise MissingParameter(name)
+                for name, (param_type, value_type, default) in self.endpoint_parameters.items():
+                    if param_type is AuthParam:
+                        received_kwargs[name] = authorization
                     else:
-                        received_kwargs[name] = _cast(value, arg)
+                        try:
+                            value = get_request_parameter(param_type, name)
+                        except KeyError:
+                            if default != Parameter.empty:
+                                received_kwargs[name] = default
+                            else:
+                                raise MissingParameter(name)
+                        else:
+                            received_kwargs[name] = _cast(value, value_type)
                 return self.function(api, **received_kwargs)
             except Exception as exc:
                 if type(exc) in self.exception_catchers:
@@ -117,15 +111,17 @@ def endpoint(
     return decorator
 
 
-def _parse_endpoint_parameters(parameter: Parameter) -> tuple[ParameterType, type, Any]:
-    if parameter.annotation in (PathParam, HeaderParam):
-        param_type = ParameterType(parameter.annotation)
+def _parse_endpoint_parameters(parameter: Parameter) -> tuple[TypeAliasType, type, Any]:
+    origin = get_origin(parameter.annotation)
+    args = get_args(parameter.annotation)
+    if origin in (ValueParam, QueryParam, FormParam, AuthParam):
+        param_type = origin
+        value_type = args[0]
+    elif parameter.annotation in (PathParam, HeaderParam):
+        param_type = parameter.annotation
         value_type = str
-    elif get_origin(parameter.annotation) in (ValueParam, QueryParam, FormParam):
-        param_type = ParameterType(parameter.annotation)
-        value_type = get_args(parameter.annotation)[0]
     else:
-        param_type = ParameterType.VALUE
+        param_type = ValueParam
         value_type = parameter.annotation
     return param_type, value_type, parameter.default
 

@@ -1,21 +1,22 @@
 from functools import wraps, partial
-from typing import Callable, Optional, Any, Iterator
+from typing import Callable, Optional, Any, Iterator, TypeAliasType
 
-from eleph.api import Redirect
-from .base import ParameterType
 from .mastodon import Mastodon
+from .exceptions import Redirect
+from ..database import Database
 
 
 def get_endpoints(
+        uri: str,
+        database: Database,
         get_oauth_token: Callable[[], Optional[tuple[str, str]]],
-        get_request_parameter: Callable[[ParameterType, str], Any],
+        get_request_parameter: Callable[[TypeAliasType, str], Any],
         redirect_callback: Callable[[str], Any],
         pre_hook: Callable[[], Any] = lambda: None,
         post_hook: Callable[[Any], Any] = lambda _: None,
-        uri: str = "",
 ) -> Iterator[tuple[str, str, Callable]]:
     for service in [
-        Mastodon(uri)
+        Mastodon(uri, database)
     ]:
         for path, method, endpoint in service.get_endpoints(
             get_oauth_token=get_oauth_token,

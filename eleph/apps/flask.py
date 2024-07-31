@@ -1,14 +1,17 @@
 import logging
+from typing import TypeAliasType
 
 from flask import Flask, request, redirect
 from werkzeug.exceptions import BadRequestKeyError
 
-from ..api import get_endpoints, ParameterType, request_kwargs
+from ..api import get_endpoints, request_kwargs, PathParam, ValueParam, QueryParam, FormParam, HeaderParam
+from ..database import Database
 
 
 def create_flask_app(
         name: str,
-        uri: str = "",
+        uri: str,
+        database: Database,
         log: bool = False,
 ):
     if log:
@@ -35,6 +38,7 @@ def create_flask_app(
     app = Flask(name)
     for path, method, endpoint in get_endpoints(
             uri=uri,
+            database=database,
             get_oauth_token=_get_oauth_token,
             get_request_parameter=_get_request_parameter,
             redirect_callback=lambda url: redirect(url),
@@ -51,10 +55,10 @@ def _get_oauth_token():
             return token_type, token
 
 
-def _get_request_parameter(parameter_type: ParameterType, name: str):
-    if parameter_type == ParameterType.PATH:
+def _get_request_parameter(parameter_type: TypeAliasType, name: str):
+    if parameter_type == PathParam:
         return request_kwargs.get()[name]
-    elif parameter_type == ParameterType.VALUE:
+    elif parameter_type == ValueParam:
         try:
             return request.values[name]
         except BadRequestKeyError:
