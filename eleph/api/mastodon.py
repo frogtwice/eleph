@@ -1,9 +1,8 @@
-from abc import ABC
-from typing import TypedDict, Literal, NotRequired
+from typing import Literal, TypedDict, NotRequired
 from urllib.parse import urlencode
 
-from .api import endpoint, Redirect, API, PathParam, MissingParameter
-
+from .base import API, endpoint, PathParam
+from .exceptions import MissingParameter, Redirect
 
 ############
 # ENTITIES #
@@ -75,31 +74,16 @@ class V1Instance(TypedDict):
     uri: str
 
 
-##############
-# EXCEPTIONS #
-##############
-
-
-class ClientError(Exception):
-    pass
-
-
-class Unauthorized(Exception):
-    pass
-
-
 ##################
 # MASTODON CLASS #
 ##################
 
-class Mastodon(API, ABC):
+
+class Mastodon(API):
     def __init__(self, uri: str = ""):
         self._uri = uri
         parts = uri.split("/")
         self._instance = parts[2] if len(parts) >= 2 else ""
-
-    def oauth_validate_token(self, level: str, scopes: list[str], token: str | None):
-        pass
 
     @endpoint(
         path="/oauth/authorize",
@@ -139,7 +123,6 @@ class Mastodon(API, ABC):
             redirect_uri: str = None,
             code: str = None,
             scope: str = "read",
-            **kwargs
     ) -> Token:
         return {
             "access_token": "ACCESS_TOKEN"
@@ -152,7 +135,6 @@ class Mastodon(API, ABC):
             self,
             id: PathParam,
             limit: int = None,
-            **kwargs
     ) -> list[Account]:
         return []
 
@@ -161,7 +143,6 @@ class Mastodon(API, ABC):
     )
     def v1_accounts_verify_credentials(
             self,
-            **kwargs
     ) -> CredentialAccount:
         return {
             "id": "0",
@@ -178,7 +159,6 @@ class Mastodon(API, ABC):
     )
     def v1_announcements(
             self,
-            **kwargs
     ) -> list[Announcement]:
         return []
 
@@ -191,7 +171,6 @@ class Mastodon(API, ABC):
             redirect_uris: str = None,
             scopes: str = "read",
             website: str = None,
-            **kwargs
     ) -> Application:
         return {
             "name": client_name if isinstance(client_name, str) else "",
@@ -204,7 +183,6 @@ class Mastodon(API, ABC):
     )
     def v1_conversations(
             self,
-            **kwargs
     ) -> list[Conversation]:
         return []
 
@@ -213,7 +191,6 @@ class Mastodon(API, ABC):
     )
     def v1_instance(
             self,
-            **kwargs
     ) -> V1Instance:
         return {
             "uri": self._uri
@@ -224,7 +201,6 @@ class Mastodon(API, ABC):
     )
     def v1_markers(
             self,
-            **kwargs
     ) -> dict[str, Marker]:
         return {}
 
@@ -233,7 +209,6 @@ class Mastodon(API, ABC):
     )
     def v1_notifications(
             self,
-            **kwargs
     ) -> list[Notification]:
         return []
 
@@ -242,7 +217,6 @@ class Mastodon(API, ABC):
     )
     def v1_preferences(
             self,
-            **kwargs
     ) -> dict[str, str]:
         return {}
 
@@ -251,7 +225,6 @@ class Mastodon(API, ABC):
     )
     def v1_timelines_home(
             self,
-            **kwargs
     ) -> list[Status]:
         return []
 
@@ -260,7 +233,6 @@ class Mastodon(API, ABC):
     )
     def v1_timelines_public(
             self,
-            **kwargs
     ) -> list[Status]:
         return []
 
@@ -269,7 +241,6 @@ class Mastodon(API, ABC):
     )
     def v2_filters(
             self,
-            **kwargs
     ) -> list[Filter]:
         return []
 
@@ -289,7 +260,6 @@ class Mastodon(API, ABC):
             q: str = "",
             type: Literal["accounts", "hashtags", "statuses"] = None,
             resolve: bool = False,
-            **kwargs
     ) -> Search:
         if type == "accounts":
             return {

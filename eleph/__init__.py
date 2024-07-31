@@ -1,2 +1,1 @@
-from .flask import FlaskApp
-from .mastodon import Mastodon
+from .apps import create_flask_app
